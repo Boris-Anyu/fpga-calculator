@@ -1,0 +1,13 @@
+# Vivado generated files
+calculator.cache/
+calculator.hw/
+calculator.ip_user_files/
+calculator.runs/
+calculator.sim/
+*.dcp
+*.jou
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
