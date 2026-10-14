@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
+module four_digit_calculator(digit_in, clock, reset, Y4, Y3, Y2, Y1, Y0);
 
     //Inputs
     input [3:0] digit_in;
@@ -20,6 +20,7 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
     input reset;
     
     //Outputs
+    output reg [3:0] Y4;
     output reg [3:0] Y3;
     output reg [3:0] Y2;
     output reg [3:0] Y1;
@@ -27,6 +28,7 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
     
     //Registers
     reg [3:0] thousands, hundreds, tens, ones;
+    reg sign;
     reg [2:0] present_state, next;
     
     
@@ -39,6 +41,7 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
         hundreds  = 0;
         tens      = 0;
         ones      = 0;
+        sign      = 0;
         present_state = S0;
     end
     
@@ -54,7 +57,9 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
                 S1: if (digit_in <=4'd9 && digit_in >=4'd0)
                          next = S2;
                     else 
-                         next = S1;                 
+                            next = S1;     
+                       
+                                   
                
                 S2: if (digit_in <=4'd9 && digit_in >=4'd0) 
                          next = S3;         
@@ -66,9 +71,15 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
                     else 
                          next = S3;                         
                       
-                S4: next = S4;             
-                        
+                S4:    if (digit_in <=4'd9 && digit_in >=4'd0) 
+                         next = S4;
+                       else 
+                         next = S4;  
+               
+                                
+
                 default: next = S0;
+                
             endcase  
         end   
           
@@ -90,6 +101,7 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
                     hundreds  <= 0;
                     tens      <= 0;
                     ones      <= 0;
+                    sign      <= 0;
                 end
                
         else begin
@@ -101,6 +113,7 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
                             tens<=0; 
                             ones<=digit_in;
                         end 
+                     
                 
                 S1: if (digit_in <=4'd9 && digit_in >=4'd0)
                         begin                              
@@ -108,7 +121,12 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
                             hundreds<=0;                    
                             tens<=ones;                        
                             ones<=digit_in; 
-                        end           
+                        end     
+                        
+                     else if (digit_in == 15)
+                            begin
+                                sign <= ~sign;
+                            end      
                 
                 S2: if (digit_in <=4'd9 && digit_in >=4'd0)     
                         begin                                   
@@ -116,7 +134,12 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
                             hundreds<=tens;                        
                             tens<=ones;                            
                             ones<=digit_in;                    
-                        end                                     
+                        end    
+                        
+                    else if (digit_in == 15)
+                            begin
+                                sign <= ~sign;
+                            end                                 
                                                              
                 S3: if (digit_in <=4'd9 && digit_in >=4'd0)     
                         begin                                   
@@ -124,16 +147,19 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
                             hundreds<=tens;                        
                             tens<=ones;                            
                             ones<=digit_in;                    
-                        end                                     
+                        end  
+                     else if (digit_in == 15)
+                            begin
+                                sign <= ~sign;
+                            end                                   
+                
+                S4: if (digit_in == 15)
+                            begin
+                                sign <= ~sign;
+                            end    
+                     
                   
-                S4: if (digit_in <=4'd9 && digit_in >=4'd0) 
-                        begin
-                            thousands<=thousands;                        
-                            hundreds<=hundreds;                        
-                            tens<=tens;                            
-                            ones<=ones;
-                    end
-                  
+                    
              endcase 
              end
              end
@@ -141,44 +167,39 @@ module four_digit_calculator(digit_in, clock, reset, Y3, Y2, Y1, Y0);
 
                 // Output logic
             always @(*) begin
-                    case(present_state)
-                        S0: begin
-                                Y3 = BLANK;
-                                Y2 = BLANK;
-                                Y1 = BLANK;
-                                Y0 = ones;
-                            end
-                        S1: begin
-                                Y3 = BLANK;
-                                Y2 = BLANK;
-                                Y1 = BLANK;
-                                Y0 = ones;
-                            end
-                        S2: begin
-                                Y3 = BLANK;
-                                Y2 = BLANK;
-                                Y1 = tens;
-                                Y0 = ones;
-                            end
-                        S3: begin
-                                Y3 = BLANK;
-                                Y2 = hundreds;
-                                Y1 = tens;
-                                Y0 = ones;
-                            end
-                        S4: begin
-                                Y3 = thousands;
-                                Y2 = hundreds;
-                                Y1 = tens;
-                                Y0 = ones;
-                            end
-                        default: begin
-                                Y3 = BLANK;
-                                Y2 = BLANK;
-                                Y1 = BLANK;
-                                Y0 = 4'd0;
-                            end
-                    endcase
-                end
-                                        
+                   
+                        case(present_state)
+                             
+                          
+                             
+                                S0: if (sign == 0) begin Y4 = BLANK; Y3 = BLANK; Y2 = BLANK; Y1 = BLANK; Y0 = ones; end
+                                    else begin Y4 = BLANK; Y3 = BLANK; Y2 = BLANK; Y1 = BLANK; Y0 = ones; end
+                                    
+                                S1: if (sign == 0) begin Y4 = BLANK; Y3 = BLANK; Y2 = BLANK; Y1 = BLANK; Y0 = ones; end
+                                    else begin Y4 = BLANK; Y3 = BLANK; Y2 = BLANK; Y1 = 15; Y0 = ones; end    
+                                
+                                S2: if (sign == 0) begin Y4 = BLANK; Y3 = BLANK; Y2 = BLANK; Y1 = tens; Y0 = ones; end
+                                    else begin Y4 = BLANK; Y3 = BLANK; Y2 = 15; Y1 = tens; Y0 = ones; end
+                                
+                                S3: if (sign == 0) begin Y4 = BLANK; Y3 = BLANK; Y2 = hundreds; Y1 = tens; Y0 = ones; end
+                                    else begin Y4 = BLANK; Y3 = 15; Y2 = hundreds; Y1 = tens; Y0 = ones; end   
+                                
+                                S4: if (sign == 0) begin Y4 = BLANK; Y3 = thousands; Y2 = hundreds;Y1 = tens; Y0 = ones; end
+                                    else begin Y4 = 15; Y3 = thousands; Y2 = hundreds;Y1 = tens; Y0 = ones; end  
+                                    
+                                default: begin Y4 = BLANK; Y3 = BLANK; Y2 = BLANK; Y1 = BLANK; Y0 = ones; end
+                                       
+                                   
+            
+                         endcase
+                         end
+                              
+                                                                                                                                
             endmodule
+            
+            
+            
+            
+            
+            
+            

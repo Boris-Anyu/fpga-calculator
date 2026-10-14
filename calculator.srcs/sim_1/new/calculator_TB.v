@@ -14,12 +14,14 @@ module calculator_TB();
 
     reg [3:0] digit_in;
     reg clock, reset;
-    wire [3:0] Y3, Y2, Y1, Y0;
+   
+    wire [3:0] Y4,Y3, Y2, Y1, Y0;
     
     four_digit_calculator uut(
             .digit_in(digit_in),
             .clock(clock),
             .reset(reset),
+            .Y4(Y4),
             .Y3(Y3),
             .Y2(Y2),
             .Y1(Y1),
@@ -37,12 +39,13 @@ module calculator_TB();
      initial begin
         reset = 1;
         digit_in = 0;
+       
         
         #125 reset = 0;
         
         digit_in=4'b0001; #100;
-        digit_in=4'b0010; #100;
-        digit_in=4'b0000; #100;
+        digit_in=2; #100;
+        digit_in=15; #100;
         digit_in=4'b0011; #100;
         digit_in=4'b0101; #100;
         
@@ -53,7 +56,7 @@ module calculator_TB();
         digit_in=4'b0011; #100;
         digit_in=4'b0100; #100;
         digit_in=4'b0011; #100;
-        digit_in=4'b0100; #100;
+        digit_in=4'b1111; #100;
         
         reset = 1; #100;
         reset = 0; #25;
@@ -77,10 +80,5 @@ module calculator_TB();
         
         
         end
-        
-    
-
-
-
 
 endmodule
